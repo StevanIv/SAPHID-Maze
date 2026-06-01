@@ -2,7 +2,6 @@
 using Model;
 using View;
 using Controller;
-using System.Text.RegularExpressions;
 
 
 
@@ -18,19 +17,6 @@ class Program
 
     static void Main()
     {
-        string mazeText = @"
-xxxxxx1xxxxxxxxxxxxxxxxxxxxxxx.
- x   x   x                    .
-xx2x xxx   x xxxxxxxx    x xx .
-x  x xxxxxxx xxxxxxxxxxxxx xxx.
- x x xx      x                .
-x  x xx xxxxx  x xxxx xxxxx  x.
-xx    x xxx   xx xxx  xxx   xx.
-xxx   xxx   x xxxx   xx   x xx.
-xx     xx   x xxxx   xx   x xx.
-xxxx    xxxxx xx xxxx xxxxx xx.
-xx            xx            xx.";
-
         //-----------constants:------------
         const int rows = 25, cols = 2*rows;
         const int timeInterval = 400;

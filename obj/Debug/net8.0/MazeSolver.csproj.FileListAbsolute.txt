@@ -1,0 +1,15 @@
+C:\WebDev\SAPHID-Maze\bin\Debug\net8.0\MazeSolver.exe
+C:\WebDev\SAPHID-Maze\bin\Debug\net8.0\MazeSolver.deps.json
+C:\WebDev\SAPHID-Maze\bin\Debug\net8.0\MazeSolver.runtimeconfig.json
+C:\WebDev\SAPHID-Maze\bin\Debug\net8.0\MazeSolver.dll
+C:\WebDev\SAPHID-Maze\bin\Debug\net8.0\MazeSolver.pdb
+C:\WebDev\SAPHID-Maze\obj\Debug\net8.0\MazeSolver.GeneratedMSBuildEditorConfig.editorconfig
+C:\WebDev\SAPHID-Maze\obj\Debug\net8.0\MazeSolver.AssemblyInfoInputs.cache
+C:\WebDev\SAPHID-Maze\obj\Debug\net8.0\MazeSolver.AssemblyInfo.cs
+C:\WebDev\SAPHID-Maze\obj\Debug\net8.0\MazeSolver.csproj.CoreCompileInputs.cache
+C:\WebDev\SAPHID-Maze\obj\Debug\net8.0\MazeSolver.sourcelink.json
+C:\WebDev\SAPHID-Maze\obj\Debug\net8.0\MazeSolver.dll
+C:\WebDev\SAPHID-Maze\obj\Debug\net8.0\refint\MazeSolver.dll
+C:\WebDev\SAPHID-Maze\obj\Debug\net8.0\MazeSolver.pdb
+C:\WebDev\SAPHID-Maze\obj\Debug\net8.0\MazeSolver.genruntimeconfig.cache
+C:\WebDev\SAPHID-Maze\obj\Debug\net8.0\ref\MazeSolver.dll
