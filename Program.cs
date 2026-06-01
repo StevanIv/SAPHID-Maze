@@ -1,4 +1,5 @@
 
+using System.Text;
 using Model;
 using View;
 using Controller;
@@ -17,6 +18,9 @@ class Program
 
     static void Main()
     {
+      Console.OutputEncoding = Encoding.UTF8;
+      Console.InputEncoding = Encoding.UTF8;
+
         //-----------constants:------------
         const int rows = 25, cols = 2*rows;
         const int timeInterval = 400;
