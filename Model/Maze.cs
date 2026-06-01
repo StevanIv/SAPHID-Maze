@@ -25,7 +25,7 @@ namespace Model
         
         public Maze() => GenerateFromText(MazeGrids.mazeText);
         public Maze(bool automatic = true) => GenerateFromText(MazeGrids.mazeText);
-        public Maze(int rows, int cols) => GenerateFromText(MazeGrids.mazeText);
+        public Maze(int rows, int cols) => GenerateMaze(rows, cols);
         public Maze(int rows, int cols, MazeGenerationMode mode)
         {
             if (mode == MazeGenerationMode.Recursive)
@@ -207,11 +207,11 @@ namespace Model
                             break;
                         case '1':
                             row[colIdx] = 1;   //begin
-                            Begin = [rowIdx, colIdx];
+                            Begin = new int[] { rowIdx, colIdx };
                             break;
                         case '2':
                             row[colIdx] = 2;   //end 
-                            End = [rowIdx, colIdx];
+                            End = new int[] { rowIdx, colIdx };
                             break;
                         default:
                             row[colIdx] = 0;   //not visited
@@ -261,11 +261,11 @@ namespace Model
                             break;
                         case '1':
                             outArray[rowIdx, colIdx] = 1;   //begin
-                            Begin = [rowIdx, colIdx];
+                            Begin = new int[] { rowIdx, colIdx };
                             break;
                         case '2':
                             outArray[rowIdx, colIdx] = 2;   //end 
-                            End = [rowIdx, colIdx];
+                            End = new int[] { rowIdx, colIdx };
                             break;
                         default:
                             outArray[rowIdx, colIdx] = 0;   //not visited
