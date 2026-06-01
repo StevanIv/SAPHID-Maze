@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MazeSolver")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d4fe7e6c8c6b303cdc0651d47a05a33779bc720e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cba78459c3c12005726d2c543b4db9157359484c")]
 [assembly: System.Reflection.AssemblyProductAttribute("MazeSolver")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MazeSolver")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
