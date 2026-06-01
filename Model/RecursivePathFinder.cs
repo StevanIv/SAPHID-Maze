@@ -58,8 +58,24 @@ namespace Model
                     int cellValue = maze.MazeArray[newRow][newCol];
                     if (cellValue == 0 || cellValue == 2)
                     {
+                        // record parent and mark exploration
                         parent[newKey] = current;
+                        // enqueue the attempted move so the view can animate exploration
+                        visitedPositions.Enqueue(newPos);
+                        // mark as visited (exploration)
+                        if (maze.MazeArray[newRow][newCol] != 2)
+                            maze.MazeArray[newRow][newCol] = 4;
+
                         Recurse(newPos);
+
+                        // if this branch did not find the end, mark as mistake and enqueue
+                        if (!found)
+                        {
+                            // mark as mistake (special value)
+                            maze.MazeArray[newRow][newCol] = 5;
+                            visitedPositions.Enqueue(newPos);
+                        }
+
                         if (found) return;
                     }
                 }

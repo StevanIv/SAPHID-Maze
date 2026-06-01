@@ -45,6 +45,9 @@ namespace View
                         case 4:
                             Console.Write("⚽️");   //visited
                             break;
+                        case 5:
+                            Console.Write("❌");   //mistake/backtrack
+                            break;
                         default:
                             break;
                     }
@@ -171,6 +174,9 @@ namespace View
                         case 10:
                             Console.Write("🏅");    //completed
                             break;
+                        case 5:
+                            Console.Write("❌");   //mistake/backtrack
+                            break;
                         case 4:
                             if (currPos[0] == rowIdx && currPos[1] == colIdx) {
                                 Console.Write("⚽️");
@@ -220,7 +226,7 @@ namespace View
             var array = maze.MazeMDArray;
 
             var toBeShownPositions = new Queue<int[]>(visitedPositions);
-            var shownPositions = new Queue<int[]>();
+            var shownPositions = new List<int[]>();
 
             while (toBeShownPositions.Count > 0)
             {
@@ -229,7 +235,7 @@ namespace View
                 Console.Clear();
 
                 var currPos = toBeShownPositions.Dequeue();
-                shownPositions.Enqueue(currPos);
+                shownPositions.Add(currPos);
 
                 //Marking strategy:
 
@@ -267,16 +273,21 @@ namespace View
                                 {
                                     Console.Write("⚽️");
                                 }
-                                else if (shownPositions.Any(_ => _[0] == rowIdx && _[1] == colIdx))
-                                {
-                                    Console.Write("🏃");
-                                }
                                 else
-                                    Console.Write("  ");
+                                {
+                                    int visitedIndex = IndexOfPosition(shownPositions, rowIdx, colIdx);
+                                    if (visitedIndex >= 0)
+                                        Console.Write(GetTrailSymbol(symbolsArr, visitedIndex));
+                                    else
+                                        Console.Write("  ");
+                                }
                                 break;
                             //Marking strategy 
                             case 10:
                                 Console.Write("🏅");    //completed
+                                break;
+                            case 5:
+                                Console.Write("❌");   //mistake/backtrack
                                 break;
                             case 4:
                                 if (currPos[0] == rowIdx && currPos[1] == colIdx)
@@ -285,7 +296,11 @@ namespace View
                                 }
                                 else
                                 {
-                                    Console.Write("🏃");
+                                    int visitedIndex = IndexOfPosition(shownPositions, rowIdx, colIdx);
+                                    if (visitedIndex >= 0)
+                                        Console.Write(GetTrailSymbol(symbolsArr, visitedIndex));
+                                    else
+                                        Console.Write("🏃");
                                 }
                                 break;
                             default:
@@ -310,7 +325,7 @@ namespace View
             var array = maze.MazeMDArray;
 
             var toBeShownPositions = new Queue<int[]>(visitedPositions);
-            var shownPositions = new Queue<int[]>();
+            var shownPositions = new List<int[]>();
 
             while (toBeShownPositions.Count > 0)
             {
@@ -319,7 +334,7 @@ namespace View
                 Console.Clear();
 
                 var currPos = toBeShownPositions.Dequeue();
-                shownPositions.Enqueue(currPos);
+                shownPositions.Add(currPos);
 
                 //Marking strategy:
 
@@ -362,12 +377,14 @@ namespace View
                                 {
                                     Console.Write("⚽️");
                                 }
-                                else if (shownPositions.Any(_ => _[0] == rowIdx && _[1] == colIdx))
-                                {
-                                    Console.Write("🏃");
-                                }
                                 else
-                                    Console.Write("  ");
+                                {
+                                    int visitedIndex = IndexOfPosition(shownPositions, rowIdx, colIdx);
+                                    if (visitedIndex >= 0)
+                                        Console.Write(GetTrailSymbol(symbolsArr, visitedIndex));
+                                    else
+                                        Console.Write("  ");
+                                }
                                 break;
                             //Marking strategy 
                             case 10:
@@ -380,7 +397,11 @@ namespace View
                                 }
                                 else
                                 {
-                                    Console.Write("🏃");
+                                    int visitedIndex = IndexOfPosition(shownPositions, rowIdx, colIdx);
+                                    if (visitedIndex >= 0)
+                                        Console.Write(GetTrailSymbol(symbolsArr, visitedIndex));
+                                    else
+                                        Console.Write("🏃");
                                 }
                                 break;
                             default:
@@ -429,6 +450,31 @@ namespace View
             }
 
             return symbols;
+        }
+
+        private static string GetTrailSymbol(string[] symbolsArr, int index)
+        {
+            if (symbolsArr == null || symbolsArr.Length == 0)
+                return "🏃";
+
+            if (index < 0)
+                index = 0;
+
+            if (index >= symbolsArr.Length)
+                index = symbolsArr.Length - 1;
+
+            return symbolsArr[index];
+        }
+
+        private static int IndexOfPosition(List<int[]> positions, int rowIdx, int colIdx)
+        {
+            for (int i = 0; i < positions.Count; i++)
+            {
+                if (positions[i][0] == rowIdx && positions[i][1] == colIdx)
+                    return i;
+            }
+
+            return -1;
         }
 
         public void DisplaySuccess(bool success, string msg, int timeInterval)
