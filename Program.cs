@@ -8,6 +8,24 @@ using Controller;
 
 class Program
 {
+  private static Maze CreateMaze(int rows, int cols)
+  {
+    Console.Clear();
+    Console.ForegroundColor = ConsoleColor.DarkRed;
+    Console.WriteLine("Choose the maze generator:");
+    Console.WriteLine("D - Default maze from text");
+    Console.WriteLine("R - Recursive maze generation");
+    Console.Write("Selection: ");
+
+    ConsoleKey choice = Console.ReadKey(true).Key;
+    Console.WriteLine(choice);
+
+    if (choice == ConsoleKey.R)
+      return new Maze(rows, cols, MazeGenerationMode.Recursive);
+
+    return new Maze(rows, cols);
+  }
+
     private static void StartMenu (Maze maze, MazeView view)
     {
       Console.ForegroundColor = ConsoleColor.DarkRed;
@@ -35,7 +53,7 @@ class Program
         //OR
         //Maze maze = new Maze(false);
 
-        Maze maze = new Maze(rows, cols);
+        Maze maze = CreateMaze(rows, cols);
         MazeView view = new MazeView();
 
         MenuController menuController = new MenuController(maze, view, timeInterval);

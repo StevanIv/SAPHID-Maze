@@ -3,6 +3,12 @@ using System.Data;
 
 namespace Model
 {
+    public enum MazeGenerationMode
+    {
+        Default,
+        Recursive
+    }
+
     public class Maze
     {
         public int[][] MazeArray { get; private set; }
@@ -17,9 +23,16 @@ namespace Model
             new int[] {  0,  1 },  //right
             };
         
-        public Maze() => GenerateMaze();
-        public Maze(bool automatic = true) {if(automatic) GenerateMaze(); else GenerateFromText(MazeGrids.mazeText);}
-        public Maze(int rows, int cols) {if(rows <= 0 && cols <= 0) GenerateFromText(MazeGrids.mazeText); else GenerateMaze(rows, cols);}
+        public Maze() => GenerateFromText(MazeGrids.mazeText);
+        public Maze(bool automatic = true) => GenerateFromText(MazeGrids.mazeText);
+        public Maze(int rows, int cols) => GenerateFromText(MazeGrids.mazeText);
+        public Maze(int rows, int cols, MazeGenerationMode mode)
+        {
+            if (mode == MazeGenerationMode.Recursive)
+                GenerateMaze(rows, cols);
+            else
+                GenerateFromText(MazeGrids.mazeText);
+        }
         public Maze(string lines) => GenerateFromText(lines);
 
         void GenerateFromText(string lines){
@@ -33,9 +46,142 @@ namespace Model
             if(rows % 2 != 0) {rows++;}
             if(cols % 2 != 0) {cols++;}
 
-            //ToDo...
+            var mazeGrid = CreateFilledGrid(rows, cols, -1);
+            var visited = new bool[rows, cols];
 
-            GenerateFromText(MazeGrids.mazeText); //remove this line and implement the task
+            int startRow = 1;
+            int startCol = 1;
+
+            CarvePassagesRecursive(mazeGrid, visited, startRow, startCol);
+
+            int[] begin = new int[] { startRow, startCol };
+            int[] end = FindFarthestPassage(mazeGrid, begin);
+
+            mazeGrid[begin[0]][begin[1]] = 1;
+            mazeGrid[end[0]][end[1]] = 2;
+
+            ApplyGeneratedGrid(mazeGrid, begin, end);
+        }
+
+        private static int[][] CreateFilledGrid(int rows, int cols, int fillValue)
+        {
+            var grid = new int[rows][];
+
+            for (int rowIdx = 0; rowIdx < rows; rowIdx++)
+            {
+                grid[rowIdx] = new int[cols];
+
+                for (int colIdx = 0; colIdx < cols; colIdx++)
+                {
+                    grid[rowIdx][colIdx] = fillValue;
+                }
+            }
+
+            return grid;
+        }
+
+        private void CarvePassagesRecursive(int[][] grid, bool[,] visited, int row, int col)
+        {
+            visited[row, col] = true;
+            grid[row][col] = 0;
+
+            var directions = new (int dRow, int dCol)[]
+            {
+                (-2, 0),
+                (2, 0),
+                (0, -2),
+                (0, 2)
+            };
+
+            foreach (var (dRow, dCol) in directions.OrderBy(_ => Random.Shared.Next()))
+            {
+                int nextRow = row + dRow;
+                int nextCol = col + dCol;
+
+                if (nextRow <= 0 || nextRow >= grid.Length - 1 ||
+                    nextCol <= 0 || nextCol >= grid[0].Length - 1 ||
+                    visited[nextRow, nextCol])
+                {
+                    continue;
+                }
+
+                grid[row + dRow / 2][col + dCol / 2] = 0;
+                CarvePassagesRecursive(grid, visited, nextRow, nextCol);
+            }
+        }
+
+        private static int[] FindFarthestPassage(int[][] grid, int[] begin)
+        {
+            var queue = new Queue<int[]>();
+            var distance = new int[grid.Length][];
+
+            for (int rowIdx = 0; rowIdx < grid.Length; rowIdx++)
+            {
+                distance[rowIdx] = new int[grid[rowIdx].Length];
+
+                for (int colIdx = 0; colIdx < grid[rowIdx].Length; colIdx++)
+                {
+                    distance[rowIdx][colIdx] = -1;
+                }
+            }
+
+            queue.Enqueue(begin);
+            distance[begin[0]][begin[1]] = 0;
+
+            int[] farthest = begin;
+
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+                int currentDistance = distance[current[0]][current[1]];
+
+                if (currentDistance >= distance[farthest[0]][farthest[1]])
+                {
+                    farthest = current;
+                }
+
+                foreach (var move in new[]
+                {
+                    new int[] { 1, 0 },
+                    new int[] { -1, 0 },
+                    new int[] { 0, 1 },
+                    new int[] { 0, -1 }
+                })
+                {
+                    int nextRow = current[0] + move[0];
+                    int nextCol = current[1] + move[1];
+
+                    if (nextRow < 0 || nextCol < 0 ||
+                        nextRow >= grid.Length || nextCol >= grid[0].Length ||
+                        grid[nextRow][nextCol] == -1 ||
+                        distance[nextRow][nextCol] != -1)
+                    {
+                        continue;
+                    }
+
+                    distance[nextRow][nextCol] = currentDistance + 1;
+                    queue.Enqueue(new int[] { nextRow, nextCol });
+                }
+            }
+
+            return farthest;
+        }
+
+        private void ApplyGeneratedGrid(int[][] grid, int[] begin, int[] end)
+        {
+            MazeArray = grid;
+            Begin = begin;
+            End = end;
+
+            MazeMDArray = new int[grid.Length, grid[0].Length];
+
+            for (int rowIdx = 0; rowIdx < grid.Length; rowIdx++)
+            {
+                for (int colIdx = 0; colIdx < grid[rowIdx].Length; colIdx++)
+                {
+                    MazeMDArray[rowIdx, colIdx] = grid[rowIdx][colIdx];
+                }
+            }
         }
 
         int[][] ToMazeArray(string maze)
