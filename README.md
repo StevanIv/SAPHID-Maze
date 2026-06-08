@@ -1,5 +1,5 @@
 # SAPHID-Maze
 
-Hendrik -> Dijkstra
+Hendrik -> Dijkstra, dijksttra maze
 Stevan -> Stack, AStar
-Pratik -> Recursive
+Pratik -> Recursive, Visualization, recursive maze
