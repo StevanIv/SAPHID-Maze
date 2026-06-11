@@ -1,5 +1,5 @@
 # SAPHID-Maze
 
-Hendrik -> Dijkstra, dijksttra maze
-Stevan -> Stack, AStar
-Pratik -> Recursive, Visualization, recursive maze
+Hendrik -> Dijkstra Pathfinder, Dijkstra maze generator, Verslag
+Stevan -> Stack Pathfinder, AStar Pathfinder, Verslag
+Pratik -> Recursive Pathfinder, Visualization, Recursive maze generator, Verslag
