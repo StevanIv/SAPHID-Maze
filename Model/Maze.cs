@@ -6,7 +6,8 @@ namespace Model
     public enum MazeGenerationMode
     {
         Default,
-        Recursive
+        Recursive,
+        Dijkstra
     }
 
     public class Maze
@@ -16,13 +17,13 @@ namespace Model
         public int[] Begin { get; private set; }
         public int[] End { get; private set; }
 
-        public readonly int[][] moves = {           
+        public readonly int[][] moves = {
             new int[] {  1,  0 },  //down
             new int[] { -1,  0 },  //up
             new int[] {  0, -1 },  //left
             new int[] {  0,  1 },  //right
             };
-        
+
         public Maze() => GenerateFromText(MazeGrids.mazeText);
         public Maze(bool automatic = true) => GenerateFromText(MazeGrids.mazeText);
         public Maze(int rows, int cols) => GenerateMaze(rows, cols);
@@ -30,21 +31,24 @@ namespace Model
         {
             if (mode == MazeGenerationMode.Recursive)
                 GenerateMaze(rows, cols);
+            else if (mode == MazeGenerationMode.Dijkstra)
+                GenerateMazeDijkstra(rows, cols);
             else
                 GenerateFromText(MazeGrids.mazeText);
         }
         public Maze(string lines) => GenerateFromText(lines);
 
-        void GenerateFromText(string lines){
+        void GenerateFromText(string lines)
+        {
             MazeArray = ToMazeArray(lines);
             MazeMDArray = ToMazeMDArray(lines);
         }
 
         void GenerateMaze(int rows = 20, int cols = 40)
         {
-            if(rows < 4 || cols < 4) {rows = 20; cols = 40;}
-            if(rows % 2 != 0) {rows++;}
-            if(cols % 2 != 0) {cols++;}
+            if (rows < 4 || cols < 4) { rows = 20; cols = 40; }
+            if (rows % 2 != 0) { rows++; }
+            if (cols % 2 != 0) { cols++; }
 
             var mazeGrid = CreateFilledGrid(rows, cols, -1);
             var visited = new bool[rows, cols];
@@ -61,6 +65,81 @@ namespace Model
             mazeGrid[end[0]][end[1]] = 2;
 
             ApplyGeneratedGrid(mazeGrid, begin, end);
+        }
+
+        void GenerateMazeDijkstra(int rows = 20, int cols = 40)
+        {
+            if (rows < 4 || cols < 4) { rows = 20; cols = 40; }
+            if (rows % 2 != 0) rows++;
+            if (cols % 2 != 0) cols++;
+
+            var grid = CreateFilledGrid(rows, cols, -1);
+
+            var dist = new int[rows][];
+            for (int r = 0; r < rows; r++)
+            {
+                dist[r] = new int[cols];
+                for (int c = 0; c < cols; c++)
+                    dist[r][c] = int.MaxValue;
+            }
+
+            var visited = new bool[rows, cols];
+            var bst = new BSTMinPriorityQueue();
+
+            int startRow = 1, startCol = 1;
+            dist[startRow][startCol] = 0;
+            grid[startRow][startCol] = 0;
+            visited[startRow, startCol] = true;
+
+            EnqueueCellNeighbors(bst, dist, visited, grid, startRow, startCol, 0);
+
+            while (bst.Count > 0)
+            {
+                var (priority, cell, wall) = bst.DequeueMin();
+                int r = cell[0], c = cell[1];
+
+                if (visited[r, c]) continue;
+
+                visited[r, c] = true;
+                dist[r][c] = priority;
+                grid[r][c] = 0;
+                grid[wall[0]][wall[1]] = 0;
+
+                EnqueueCellNeighbors(bst, dist, visited, grid, r, c, priority);
+            }
+
+            int[] begin = new int[] { startRow, startCol };
+            int[] end = FindFarthestPassage(grid, begin);
+            grid[begin[0]][begin[1]] = 1;
+            grid[end[0]][end[1]] = 2;
+
+            ApplyGeneratedGrid(grid, begin, end);
+        }
+
+        private static void EnqueueCellNeighbors(
+            BSTMinPriorityQueue bst, int[][] dist, bool[,] visited,
+            int[][] grid, int row, int col, int currentDist)
+        {
+            var directions = new (int dr, int dc)[] { (-2, 0), (2, 0), (0, -2), (0, 2) };
+
+            foreach (var (dr, dc) in directions)
+            {
+                int nr = row + dr, nc = col + dc;
+                int wr = row + dr / 2, wc = col + dc / 2;
+
+                if (nr <= 0 || nr >= grid.Length - 1 || nc <= 0 || nc >= grid[0].Length - 1)
+                    continue;
+                if (visited[nr, nc]) continue;
+
+                int edgeWeight = Random.Shared.Next(1, 1000);
+                int newDist = currentDist + edgeWeight;
+
+                if (newDist < dist[nr][nc])
+                {
+                    dist[nr][nc] = newDist;
+                    bst.Enqueue(newDist, new int[] { nr, nc }, new int[] { wr, wc });
+                }
+            }
         }
 
         private static int[][] CreateFilledGrid(int rows, int cols, int fillValue)
@@ -223,7 +302,7 @@ namespace Model
             }
 
             return outArray;
-            
+
         }
 
         int[,] ToMazeMDArray(string maze)
@@ -236,15 +315,15 @@ namespace Model
             if (arrayLines != null && arrayLines.Length > 0)
                 lineLength = arrayLines[0].Length;
             else
-            throw new Exception($"Maze incorrect");
-            
+                throw new Exception($"Maze incorrect");
+
             for (var rowIdx = 0; arrayLines != null && rowIdx < arrayLines.Length; rowIdx++)
             {
                 var line = arrayLines[rowIdx];
                 if (arrayLines[rowIdx] == null || line.Length != lineLength)
                     throw new Exception($"Not same line length for rows in maze:\n at row 0: {lineLength}, at row {rowIdx}: {line.Length}");
             }
-            
+
             int[,] outArray = new int[arrayLines.Length, lineLength];
 
             for (var rowIdx = 0; rowIdx < arrayLines.Length; rowIdx++)
@@ -309,10 +388,10 @@ namespace Model
                     && !(newRow >= array.Length)
                     && !(newColumn >= array[newRow].Length);
         }
-        
+
         // Make sure the position is within the maze array bounds.
         // no walls
-        public bool IsValidMove(int newRow, int newColumn) => 
+        public bool IsValidMove(int newRow, int newColumn) =>
             IsValidPos(MazeArray, newRow, newColumn) &&
             !(MazeArray[newRow][newColumn] == -1); //no walls 
 
@@ -328,12 +407,12 @@ namespace Model
                     IsValidPos(MazeArray, newRow, newColumn) &&
                     !(MazeArray[newRow][newColumn] == -1 || MazeArray[newRow][newColumn] == 4); //no walls, not yet visited 
         }
-        
+
     }
 
     public static class MazeGrids
     {
-      public static string mazeText = @"
+        public static string mazeText = @"
 xxxxxx1xxxxxxxxxxxxxxxxxxxxxxx.
  x   x   x                    .
 xx2x xxx   x xxxxxxxx    x xx .
